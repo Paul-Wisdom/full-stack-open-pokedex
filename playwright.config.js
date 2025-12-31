@@ -1,6 +1,6 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test'
 export default defineConfig({
-    testDir: './test/e2e-tests',
+  testDir: './test/e2e-tests',
   webServer: {
     command: 'npm run start',
     url: 'http://localhost:8080',
@@ -10,4 +10,4 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:8080/',
   },
-});
+})
