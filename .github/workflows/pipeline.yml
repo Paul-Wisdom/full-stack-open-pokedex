@@ -9,8 +9,8 @@ on:
     types: [opened, synchronize]
 
 env:
-  DEPLOYMENT_CONDITION: ${{github.event_name == 'push' && !contains(github.event.commit[0].message, '#skip') && !contains(github.event.commit[1].message, '#skip')}}
-
+  DEPLOYMENT_CONDITION: ${{ github.event_name == 'push' && !contains(toJSON(github.event.commits.*.message), '#skip') }}
+  
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-latest
@@ -47,6 +47,9 @@ jobs:
           service_id: ${{ secrets.RENDER_SERVICE_ID }}
           api_key: ${{ secrets.RENDER_API_KEY }}
           wait_deploy: true
+      - name: deployment condition
+        run: |
+              echo ${{env.DEPLOYMENT_CONDITION}}
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
