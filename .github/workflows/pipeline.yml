@@ -8,9 +8,14 @@ on:
     branches: [main]
     types: [opened, synchronize]
 
+env:
+  DEPLOYMENT_CONDITION: ${{github.event_name == 'push' && !contains(github.event.commit[0].message, '#skip') && !contains(github.event.commit[1].message, '#skip')}}
+
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-latest
+    outputs:
+      tag_release_can_run: ${{steps.final.outcome == 'success'}}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -35,13 +40,22 @@ jobs:
           path: playwright-report/
           retention-days: 30
       - name: Deploy to render
+        id: final
         uses: JorgeLNJunior/render-deploy@v1.4.7
-        if: ${{ github.event_name == 'push' }}
+        if: ${{env.DEPLOYMENT_CONDITION == true }}
         with:
           service_id: ${{ secrets.RENDER_SERVICE_ID }}
           api_key: ${{ secrets.RENDER_API_KEY }}
           wait_deploy: true
-      - name: github event
-        env: 
-          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
-        run: echo "$COMMIT_MESSAGES"
+  tag_release:
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: ${{simple_deployment_pipeline.outputs.tag_release_can_run == 'true'}}
+    steps:
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@4ed44965e0db8dab2b466a16da04aec3cc312fd8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
