@@ -10,7 +10,7 @@ on:
 
 env:
   DEPLOYMENT_CONDITION: ${{ github.event_name == 'push' && !contains(toJSON(github.event.commits.*.message), '#skip') }}
-  
+
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
       - name: Deploy to render
         id: final
         uses: JorgeLNJunior/render-deploy@v1.4.7
-        if: ${{env.DEPLOYMENT_CONDITION == true }}
+        if: ${{env.DEPLOYMENT_CONDITION == 'true' }}
         with:
           service_id: ${{ secrets.RENDER_SERVICE_ID }}
           api_key: ${{ secrets.RENDER_API_KEY }}
