@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
 
 jobs:
   simple_deployment_pipeline:
@@ -31,8 +34,14 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-      - uses: JorgeLNJunior/render-deploy@v1.4.7
+      - name: Deploy to render
+        uses: JorgeLNJunior/render-deploy@v1.4.7
+        if: ${{ github.event_name == 'push' }}
         with:
           service_id: ${{ secrets.RENDER_SERVICE_ID }}
           api_key: ${{ secrets.RENDER_API_KEY }}
           wait_deploy: true
+      - name: github event
+        env: 
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+        run: echo "$COMMIT_MESSAGES"
