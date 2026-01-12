@@ -67,17 +67,9 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Discord Success Notification
+      - name: Discord Notification
         uses: hunghg255/action-notifications@master
-        if: needs.tag_release.result == 'success'
         with:
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          title: New build deployed
+          title: New build deployement
           description: Test at https://full-stack-open-pokedex-w6g2.onrender.com
-      - name: Discord Failure Notification
-        uses: rjstone/discord-webhook-notify@v2
-        if: needs.tag_release.result == 'failure'
-        with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          severity: error
-          details: Build failed!
