@@ -47,19 +47,6 @@ jobs:
           service_id: ${{ secrets.RENDER_SERVICE_ID }}
           api_key: ${{ secrets.RENDER_API_KEY }}
           wait_deploy: true 
-      - name: Notify Discord
-        uses: rjstone/discord-webhook-notify@v2
-        if: ${{success()}}
-        with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          severity: info
-          details: New build deployed!
-          description: to https://full-stack-open-pokedex-w6g2.onrender.com
-        if: ${{cancelled()}}
-        with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          severity: error
-          details: Build failed!
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
@@ -75,3 +62,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
+  notify:
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Discord Success Notification
+        uses: rjstone/discord-webhook-notify@v2
+        if: needs.simple_deployment_pipeline.result == 'success'
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: info
+          details: New build deployed to https://full-stack-open-pokedex-w6g2.onrender.com
+      - name: Discord Failure Notification
+        uses: rjstone/discord-webhook-notify@v2
+        if: needs.simple_deployment_pipeline.result == 'failure'
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: error
+          details: Build failed!
