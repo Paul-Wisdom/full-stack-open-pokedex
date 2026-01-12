@@ -65,7 +65,7 @@ jobs:
   notify_discord:
     needs: [tag_release]
     runs-on: ubuntu-latest
-    if: always()
+    if: env.DEPLOYMENT_CONDITION == 'true'
     steps:
       - name: Discord Success Notification
         uses: hunghg255/action-notifications@master
@@ -78,6 +78,6 @@ jobs:
         uses: hunghg255/action-notifications@master
         if: needs.tag_release.result != 'success'
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          discord_webhook:: ${{ secrets.DISCORD_WEBHOOK }}
           title: New build deployement
           status: failure
