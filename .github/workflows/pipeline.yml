@@ -71,14 +71,14 @@ jobs:
         run: echo ${{env.DEPLOYMENT_CONDITION}}
       - name: Discord Success Notification
         uses: hunghg255/action-notifications@master
-        if: ${{needs.simple_deployment_pipeline.result == 'success' && env.DEPLOYMENT_CONDITION}}
+        if: ${{needs.simple_deployment_pipeline.result == 'success' && env.DEPLOYMENT_CONDITION == 'true'}}
         with:
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
           title: New build deployed
           description: Test at https://full-stack-open-pokedex-w6g2.onrender.com
       - name: Discord Failure Notification
         uses: hunghg255/action-notifications@master
-        if: ${{ needs.simple_deployment_pipeline.result != 'success' && env.DEPLOYMENT_CONDITION}}
+        if: ${{ needs.simple_deployment_pipeline.result != 'success' && env.DEPLOYMENT_CONDITION == 'true'}}
         with:
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
           title: New build deployement
