@@ -65,7 +65,7 @@ jobs:
   notify_discord:
     needs: [tag_release]
     runs-on: ubuntu-latest
-    if: env.DEPLOYMENT_CONDITION == 'true'
+    if: ${{env.DEPLOYMENT_CONDITION == 'true'}}
     steps:
       - name: Discord Success Notification
         uses: hunghg255/action-notifications@master
