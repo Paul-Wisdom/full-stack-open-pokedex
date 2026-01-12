@@ -46,7 +46,20 @@ jobs:
         with:
           service_id: ${{ secrets.RENDER_SERVICE_ID }}
           api_key: ${{ secrets.RENDER_API_KEY }}
-          wait_deploy: true
+          wait_deploy: true 
+      - name: Notify Discord
+        uses: rjstone/discord-webhook-notify@v2
+        if: ${{success()}}
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: info
+          details: New build deployed!
+          description: to https://full-stack-open-pokedex-w6g2.onrender.com
+        if: ${{cancelled()}}
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: error
+          details: Build failed!
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
